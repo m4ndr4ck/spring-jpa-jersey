@@ -1,10 +1,10 @@
-package br.com.cinq.spring.data.sample.application;
+package br.com.cinq.cities.application;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
-import org.springframework.boot.context.web.SpringBootServletInitializer;
-import org.springframework.boot.orm.jpa.EntityScan;
+import org.springframework.boot.web.support.SpringBootServletInitializer;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
@@ -12,9 +12,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
  * Greeting Service.
  */
 @SpringBootApplication
-@ComponentScan(basePackages = { "br.com.cinq.spring.data.sample" })
-@EntityScan(basePackages = { "br.com.cinq.spring.data.sample.entity" })
-@EnableJpaRepositories("br.com.cinq.spring.data.sample.repository")
+@ComponentScan(basePackages = { "br.com.cinq.cities" })
+@EntityScan(basePackages = { "br.com.cinq.cities.model" })
+@EnableJpaRepositories("br.com.cinq.cities.repository")
 @EnableAutoConfiguration
 public class Application extends SpringBootServletInitializer {
 

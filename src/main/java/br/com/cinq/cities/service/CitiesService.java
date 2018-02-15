@@ -1,6 +1,7 @@
 package br.com.cinq.cities.service;
 
 import br.com.cinq.cities.model.City;
+import br.com.cinq.cities.model.Country;
 
 import java.util.List;
 
@@ -10,5 +11,7 @@ import java.util.List;
 public interface CitiesService {
     public List<City> getAllCities();
 
-    public List<City> findCity(String country);
+    public List<City> findByCountry(Country country);
+
+    public List<Country> getCountries(String name);
 }

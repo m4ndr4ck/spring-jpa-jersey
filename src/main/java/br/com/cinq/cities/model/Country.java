@@ -1,6 +1,7 @@
 package br.com.cinq.cities.model;
 
 import javax.persistence.*;
+import java.util.Set;
 
 /**
  * Created by dvsjunior on 14/02/2018.
@@ -9,11 +10,13 @@ import javax.persistence.*;
 @Table(name = "Country")
 public class Country {
 
+    @Id
+    @GeneratedValue
     private Long id;
     private String name;
+    @OneToMany(mappedBy = "country", cascade = CascadeType.ALL)
+    private Set<City> city;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
     public Long getId() {
         return id;
     }

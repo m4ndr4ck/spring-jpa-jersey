@@ -10,12 +10,16 @@ import java.util.Set;
 @Table(name = "City")
 public class City {
 
-    private long id;
-    private String name;
-    private Country country;
-
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
+
+    private String name;
+
+    @ManyToOne
+    @JoinColumn(name = "country_id")
+    private Country country;
+
     public long getId() {
         return id;
     }
@@ -23,7 +27,6 @@ public class City {
     public void setId(long id) {
         this.id = id;
     }
-
 
     public String getName() {
         return name;
@@ -33,8 +36,6 @@ public class City {
         this.name = name;
     }
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
     public Country getCountry() {
         return country;
     }

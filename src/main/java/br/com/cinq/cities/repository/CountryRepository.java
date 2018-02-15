@@ -10,5 +10,13 @@ import java.util.List;
  * Created by dvsjunior on 14/02/2018.
  */
 public interface CountryRepository extends JpaRepository<Country, Long>{
-    public List<Country> findByNameIgnoreCaseContaining(String name);
+
+    List<Country> findByNameIgnoreCaseContaining(String country);
+
+    Country findByName(String country);
+
+    Country findById(long id);
+
+
+
 }

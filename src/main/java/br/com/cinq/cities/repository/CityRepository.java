@@ -3,6 +3,7 @@ package br.com.cinq.cities.repository;
 import br.com.cinq.cities.model.City;
 import br.com.cinq.cities.model.Country;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
@@ -13,5 +14,9 @@ public interface CityRepository extends JpaRepository<City, Long> {
 
     @Override
     List<City> findAll();
-    List<City> findByCountry(Country country);
+
+    List<City> findByCountry(Country name);
+
+    City findByNameIgnoreCaseContaining(String name);
+
 }

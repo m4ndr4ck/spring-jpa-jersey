@@ -7,6 +7,8 @@ import br.com.cinq.cities.repository.CountryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import java.util.List;
 
 /**
@@ -14,6 +16,9 @@ import java.util.List;
  */
 @Service
 public class CitiesServiceImpl implements CitiesService {
+
+    @PersistenceContext
+    private EntityManager entityManager;
 
     @Autowired
     CityRepository cityRepository;
@@ -25,11 +30,33 @@ public class CitiesServiceImpl implements CitiesService {
         return cityRepository.findAll();
     }
 
-    public List<City> findByCountry(Country country){
-        return cityRepository.findByCountry(country);
+    public List<City> findByCountry(Country name){
+        return cityRepository.findByCountry(name);
     }
 
-    public List<Country> getCountries(String name){
-        return countryRepository.findByNameIgnoreCaseContaining(name);
+    public List<Country> getCountries(String country){
+        return countryRepository.findByNameIgnoreCaseContaining(country);
     }
+
+    public Country findCountryById(long id){
+        return countryRepository.findById(id);
+    }
+
+    public Country findCountryByName(String name){
+        return countryRepository.findByName(name);
+    }
+
+
+    public City findCityByName(String name){
+        return cityRepository.findByNameIgnoreCaseContaining(name);
+    }
+
+    public void addCity(City city){
+        cityRepository.save(city);
+    }
+
+    public void addCountry(Country country){
+        countryRepository.save(country);
+    }
+
 }

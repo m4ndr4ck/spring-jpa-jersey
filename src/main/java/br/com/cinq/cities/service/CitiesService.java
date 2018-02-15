@@ -9,9 +9,21 @@ import java.util.List;
  * Created by dvsjunior on 14/02/2018.
  */
 public interface CitiesService {
-    public List<City> getAllCities();
 
-    public List<City> findByCountry(Country country);
+    List<City> getAllCities();
 
-    public List<Country> getCountries(String name);
+    List<City> findByCountry(Country name);
+
+    List<Country> getCountries(String country);
+
+    Country findCountryById(long id);
+
+    Country findCountryByName(String name);
+
+    City findCityByName(String name);
+
+    void addCity(City city);
+
+    void addCountry(Country country);
+
 }

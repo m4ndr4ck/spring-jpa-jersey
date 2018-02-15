@@ -1,45 +1,78 @@
 package br.com.cinq.cities.endpoint;
 
-import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriInfo;
 
+import br.com.cinq.cities.model.City;
 import br.com.cinq.cities.model.Country;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import br.com.cinq.cities.service.CitiesServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import br.com.cinq.cities.model.City;
 import br.com.cinq.cities.service.CitiesService;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Component
 @Path("/cities")
 public class CitiesEndpoint {
-    private static final Logger logger = LoggerFactory.getLogger(CitiesEndpoint.class);
+
     @Autowired
     private CitiesService citiesService;
+
     @GET
-    @Produces(MediaType.APPLICATION_JSON)
-    public Response getArticleDetails(
-            @QueryParam("country") String name) {
-        List<City> list = null;
-        if(name!=null) {
-            List<Country> countries = citiesService.getCountries(name);
-            for (Country country : countries) {
-                System.out.println(country.getName());
-                list = citiesService.findByCountry(country);
-            }
-        }else{
-        list =  citiesService.getAllCities();
-        }
-        return Response.ok(list).build();
+    public Response getCities(@QueryParam("country") String country) {
+
+        //If country is null get all city/countries. Otherwise it filters by country.
+        List<?> cities = country!=null ? citiesService.getCountries(country)
+                .stream()
+                .map(name -> citiesService.findByCountry(name)).flatMap(x -> x.stream())
+                .collect(Collectors.toList()) : citiesService.getAllCities();
+
+        return Response.
+                ok(cities.isEmpty() ? "Can't process your request": cities).
+                type(cities.isEmpty() ? MediaType.TEXT_PLAIN: MediaType.APPLICATION_JSON).
+                build();
     }
+
+    @POST
+    @Path("/add/city")
+    public Response addCity(@RequestBody List<City> newcity) {
+
+        try {
+            //Check whether request country id exists on database before to add new city
+            if(newcity.
+                    stream().
+                    map(city -> city.getCountry()).
+                    anyMatch(country -> citiesService.findCountryById(country.getId()) == null))
+            throw new CitiesServiceException("Country id doesn't exist");
+
+            //Add city
+            newcity.stream().forEach(city -> citiesService.addCity(city));
+
+        }catch (CitiesServiceException citiesServiceException){
+            return Response.ok("Request error: "+ citiesServiceException.getMessage()).build();
+        }
+
+        return Response.ok("Success!").build();
+    }
+
+    @POST
+    @Path("/add/country")
+    public Response addCountry(@RequestBody List<Country> newcountry) {
+        try {
+            if (newcountry.
+                    stream().
+                    noneMatch(city -> citiesService.findCountryByName(city.getName()) == null))
+                throw new CitiesServiceException("Country name already exists");
+
+            //Add Country
+            newcountry.forEach(country -> citiesService.addCountry(country));
+        } catch (CitiesServiceException citiesServiceException) {
+            return Response.ok("Request error: " + citiesServiceException.getMessage()).build();
+        }
+        return Response.ok("Success!").build();
+    }
+
 } 

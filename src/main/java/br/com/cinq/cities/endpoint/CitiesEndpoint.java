@@ -13,6 +13,8 @@ import javax.ws.rs.core.Response;
 import br.com.cinq.cities.model.City;
 import br.com.cinq.cities.model.Country;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import br.com.cinq.cities.service.CitiesService;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -36,6 +38,7 @@ public class CitiesEndpoint {
         return Response.
                 ok(cities.isEmpty() ? "Can't process your request": cities).
                 type(cities.isEmpty() ? MediaType.TEXT_PLAIN: MediaType.APPLICATION_JSON).
+                status(cities.isEmpty() ? Response.Status.BAD_REQUEST: Response.Status.OK).
                 build();
     }
 
@@ -79,7 +82,7 @@ public class CitiesEndpoint {
 
         }catch (Exception exception){
 
-            return Response.ok("Request error: "+ exception.getMessage()).build();
+            return Response.ok("Request error: "+exception.getMessage()).status(Response.Status.BAD_REQUEST).build();
 
         }
 

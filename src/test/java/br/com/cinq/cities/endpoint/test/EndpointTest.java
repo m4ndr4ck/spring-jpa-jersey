@@ -15,10 +15,12 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import br.com.cinq.cities.model.City;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.junit.experimental.categories.Category;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = Application.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("unit")
+@Category(IntegrationTest.class)
 public class EndpointTest {
     Logger logger = LoggerFactory.getLogger(EndpointTest.class);
 

@@ -82,3 +82,43 @@ Post the percentage of line covered by tests of your application.
 
 
 ** PLUS: It would be great if you can come up with unit and integration tests separately in their apropriate building phases.
+
+## Davi Junior's Implementation Notes ##
+
+- Test line percentage coverage with Jacoo (mvn clean install)
+- Split of unit and integration tests with Surefire-junit47 (mvn clean install)
+- Two new endpoints created to allow city and country insertion
+- Added a new integration test to check the new endpoints
+- All new code features relies strongly on Java lambdas and streams
+
+To add new country:
+
+JSON POST to http://localhost:8090/rest/cities/add/country
+
+    [
+        {
+            "name":"Canada"
+        },
+        {
+            "name":"Germany"
+        }
+    ]
+
+To add new city:
+
+JSON POST to http://localhost:8090/rest/cities/add/city
+
+    [
+        {
+            "name":"Toronto",
+            "country":{
+                "id":4
+            }
+        },
+        {
+            "name":"Berlin",
+            "country":{
+                "id":5
+            }
+        }
+    ]

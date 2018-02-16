@@ -1,6 +1,10 @@
 package br.com.cinq.cities.endpoint;
 
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.TreeSet;
+import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
@@ -8,7 +12,6 @@ import javax.ws.rs.core.Response;
 
 import br.com.cinq.cities.model.City;
 import br.com.cinq.cities.model.Country;
-import br.com.cinq.cities.service.CitiesServiceException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import br.com.cinq.cities.service.CitiesService;
@@ -40,39 +43,74 @@ public class CitiesEndpoint {
     @Path("/add/city")
     public Response addCity(@RequestBody List<City> newcity) {
 
+        List<City> cities = new ArrayList<>();
+
         try {
             //Check whether request country id exists on database before to add new city
             if(newcity.
                     stream().
                     map(city -> city.getCountry()).
-                    anyMatch(country -> citiesService.findCountryById(country.getId()) == null))
-            throw new CitiesServiceException("Country id doesn't exist");
+                    anyMatch(country -> citiesService.findCountryById(country.getId())==null))
+            throw new Exception("Country id doesn't exist - Request not processed");
 
-            //Add city
-            newcity.stream().forEach(city -> citiesService.addCity(city));
+            //Prevent the request from add the repeated city and country id
+            BiPredicate<City, City> p = (cityobj, city) -> (cityobj.getCountry().getId() == city.getCountry().getId()) &&
+            (cityobj.getName().equals(city.getName()));
+            if(newcity.
+                    stream().anyMatch(city -> {
+                    boolean ret = false;
+                    for(City cityobj : citiesService.findCityByName(city.getName()))
+                        if(p.test(cityobj, city)){
+                        ret = true;
+                        break;
+                        }
+                    return ret;}
+            ))
+            throw new Exception("City name and country id already exist");
 
-        }catch (CitiesServiceException citiesServiceException){
-            return Response.ok("Request error: "+ citiesServiceException.getMessage()).build();
+            //Add city removing duplicates from JSON request
+            newcity.stream().collect(
+                    Collectors.toCollection(()->new TreeSet<>(Comparator.comparing(City::getName)))).
+                    stream()
+                    .forEach(city -> {
+                citiesService.addCity(city);
+                cities.add(city);
+            });
+
+        }catch (Exception exception){
+
+            return Response.ok("Request error: "+ exception.getMessage()).build();
+
         }
 
-        return Response.ok("Success!").build();
+        return Response.ok(cities).type(MediaType.APPLICATION_JSON).build();
     }
 
     @POST
     @Path("/add/country")
     public Response addCountry(@RequestBody List<Country> newcountry) {
+
+        List<Country> countries = new ArrayList<>();
+
         try {
+            //Check whether country name already exists on database
             if (newcountry.
                     stream().
-                    noneMatch(city -> citiesService.findCountryByName(city.getName()) == null))
-                throw new CitiesServiceException("Country name already exists");
+                    anyMatch(country -> citiesService.findCountryByName(country.getName())!=null))
+                throw new Exception("Country name already exists");
 
-            //Add Country
-            newcountry.forEach(country -> citiesService.addCountry(country));
-        } catch (CitiesServiceException citiesServiceException) {
-            return Response.ok("Request error: " + citiesServiceException.getMessage()).build();
+            //Add country removing duplicates from JSON request
+            newcountry.stream().collect(
+                    Collectors.toCollection(()->new TreeSet<>(Comparator.comparing(Country::getName)))).
+                    stream().
+                    forEach(country ->{
+                    citiesService.addCountry(country);
+                    countries.add(country);});
+
+        } catch (Exception exception) {
+            return Response.ok("Request error: " + exception.getMessage()).build();
         }
-        return Response.ok("Success!").build();
+        return Response.ok(countries).type(MediaType.APPLICATION_JSON).build();
     }
 
 } 

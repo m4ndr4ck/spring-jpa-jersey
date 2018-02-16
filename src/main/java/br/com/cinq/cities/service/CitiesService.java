@@ -20,7 +20,7 @@ public interface CitiesService {
 
     Country findCountryByName(String name);
 
-    City findCityByName(String name);
+    List<City> findCityByName(String name);
 
     void addCity(City city);
 

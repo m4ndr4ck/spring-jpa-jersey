@@ -47,8 +47,8 @@ public class CitiesServiceImpl implements CitiesService {
     }
 
 
-    public City findCityByName(String name){
-        return cityRepository.findByNameIgnoreCaseContaining(name);
+    public List<City> findCityByName(String name){
+        return cityRepository.findByNameIgnoreCase(name);
     }
 
     public void addCity(City city){
